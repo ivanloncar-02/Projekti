@@ -1,0 +1,43 @@
+/* Example CSS for the Tic Tac Toe Game */
+.square {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid #000;
+  font-size: 2rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Adding styles for strike effects */
+.strike-row-1,
+.strike-row-2,
+.strike-row-3,
+.strike-column-1,
+.strike-column-2,
+.strike-column-3,
+.strike-diagonal-1,
+.strike-diagonal-2 {
+  position: absolute;
+  background-color: red;
+  height: 10px;
+  z-index: 10;
+}
+
+/* Style for the strike effect for each row */
+.strike-row-1 {
+  top: 0;
+}
+
+.strike-row-2 {
+  top: 33%;
+}
+
+.strike-row-3 {
+  top: 66%;
+}

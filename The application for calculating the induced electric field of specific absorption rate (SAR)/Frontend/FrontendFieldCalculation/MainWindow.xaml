@@ -1,0 +1,37 @@
+﻿<Window x:Class="FrontendFieldCalculation.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
+        Title="MainWindow" Height="700" Width="800">
+    <Grid>
+        <!-- Label and Input for Frequency -->
+        <TextBlock Text="Frequency (GHz)" VerticalAlignment="Top" Margin="350,0,0,10"/>
+        <TextBox x:Name="FrequencyTextBox" Width="200" Height="30" VerticalAlignment="Top" Margin="10,20,0,0" />
+
+        <!-- Label and Input for Skin Thickness -->
+        <TextBlock Text="Skin Thickness (m)" VerticalAlignment="Top" Margin="350,50,0,10"/>
+        <TextBox x:Name="SkinThicknessTextBox" Width="200" Height="30" VerticalAlignment="Top" Margin="10,70,0,0" />
+
+        <!-- Label and Input for Fat Thickness -->
+        <TextBlock Text="Fat Thickness (m)" VerticalAlignment="Top" Margin="350,100,0,10"/>
+        <TextBox x:Name="FatThicknessTextBox" Width="200" Height="30" VerticalAlignment="Top" Margin="10,120,0,0" />
+
+        <!-- Label and Input for Muscle Thickness -->
+        <TextBlock Text="Muscle Thickness (m)" VerticalAlignment="Top" Margin="350,150,0,10"/>
+        <TextBox x:Name="MuscleThicknessTextBox" Width="200" Height="30" VerticalAlignment="Top" Margin="10,170,0,0" />
+
+        <!-- Button to trigger calculation -->
+        <Button Content="Calculate" Click="CalculateButton_Click" Width="100" Height="30" VerticalAlignment="Top" Margin="10,210,0,0"/>
+
+        <!-- TextBlock for displaying the electric field results -->
+        <TextBlock x:Name="ResultTextBlock" VerticalAlignment="Top" Margin="10,260,0,0" />
+
+        <!-- TextBlock for displaying the SAR results -->
+        <TextBlock x:Name="SARResultTextBlock" VerticalAlignment="Top" Margin="10,330,0,0" />
+
+        <!-- Cartesian Chart for displaying results -->
+        <lvc:CartesianChart x:Name="FieldChart" Margin="10,340,10,10">
+            <!-- Series and Axes will be added in code-behind -->
+        </lvc:CartesianChart>
+    </Grid>
+</Window>

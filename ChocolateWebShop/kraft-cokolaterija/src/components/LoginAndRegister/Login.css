@@ -1,0 +1,79 @@
+/* Login.css */
+
+/* Stranica login */
+.login-page {
+  display: flex;
+  justify-content: center; /* Centriranje horizontalno */
+  align-items: center; /* Centriranje vertikalno */
+  height: 100vh; /* Puni visinu ekrana */
+  background-color: #f4f4f4; /* Pozadina */
+  margin: 0; /* Uklanjanje margina */
+}
+
+/* Container za login formu */
+.login-container {
+  width: 100%;
+  max-width: 400px; /* Maksimalna širina kontejnera */
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  display: flex;
+  flex-direction: column; /* Postavlja elemente u stupce */
+  align-items: center; /* Centriranje svih elemenata unutar kontejnera */
+  box-sizing: border-box; /* Uključuje padding i border u ukupnu širinu */
+  margin: 0 auto; /* Osigurava da je kontejner centriran na stranici */
+}
+
+/* Naslov */
+h2 {
+  text-align: center; /* Centriranje naslova */
+  margin-bottom: 20px; /* Razmak ispod naslova */
+  width: 100%; /* Osigurava da naslov zauzima cijeli prostor */
+}
+
+/* Grupe za inpute */
+.input-group {
+  width: 100%; /* Osigurava da inputi zauzmu cijelu širinu kontejnera */
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  text-align: left; /* Postavlja tekst etikete lijevo */
+}
+
+/* Inputi */
+input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box; /* Uključuje padding i border u ukupnu širinu inputa */
+}
+
+/* Gumb */
+button {
+  width: 100%;
+  padding: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  box-sizing: border-box; /* Osigurava da gumb ne prelazi širinu kontejnera */
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+/* Error message */
+.error-message {
+  color: red;
+  text-align: center;
+  margin-bottom: 10px;
+}

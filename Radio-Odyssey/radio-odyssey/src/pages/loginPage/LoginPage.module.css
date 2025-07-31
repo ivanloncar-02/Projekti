@@ -1,0 +1,7 @@
+.backgroundImageContainer{
+    background-image: url('../../resources/background_image.png');
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+}

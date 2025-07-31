@@ -1,0 +1,52 @@
+/* stationDetails.module.css */
+
+.stationDetails {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(150px, 1fr)) minmax(120px, 1fr); /* Adjust column width as needed */
+  gap: 4px;
+  padding: 5px;
+}
+
+.stationDetails span {
+  border-right: 1px solid #ccc;
+  padding: 2px;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%; /* Limit text width to the container width */
+}
+
+/* Optional: Set a maximum height for each span to prevent excessive height */
+.stationDetails span {
+  max-height: 2em; /* Set the maximum height as needed */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+}
+
+/* Styling for the play button */
+.playButton {
+  padding: 10px; /* Larger padding */
+  box-sizing: border-box;
+  border: 1px solid #4caf50;
+  background-color: #4caf50;
+  color: #fff;
+  border-radius: 8px; /* Larger border radius */
+  cursor: pointer;
+  font-size: 14px; /* Larger font size */
+  transition: background-color 0.3s, color 0.3s;
+  overflow: visible; /* Ensure the content is completely visible */
+  width: 100%; /* Cover the entire width of the column */
+}
+
+.playButton:hover {
+  background-color: #45a049;
+}
+.sortButtons {
+  margin-bottom: 16px;
+}
+
+.sortButtons button {
+  margin-right: 8px;
+}

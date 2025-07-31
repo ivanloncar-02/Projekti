@@ -1,0 +1,30 @@
+.audioPlayerContainer{
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    height: 3.3rem;
+    width: 80rem;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, 250%);
+    z-index: 2;
+    background-color: rgba(167, 166, 203,0.85);
+    padding: 20px;
+}
+
+.audioPlayer{
+    justify-content: center;
+}
+button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 28px; /* Adjust the font size as needed */
+    margin-right: 8px; /* Add some spacing between buttons */
+    transition: opacity 0.3s; /* Add a transition for opacity */
+  }
+  
+  button:hover {
+    opacity: 0.4; /* Adjust the opacity on hover */
+  }
+  

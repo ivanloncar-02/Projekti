@@ -1,0 +1,29 @@
+.map-wrap {
+  overflow:visible;
+  display: flex;
+
+    position: relative;
+    width: 100%;
+    height: calc(100vh); /* calculate height of the screen minus the heading */
+  }
+  
+  .map {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+  .popupStyle{
+    color: black;
+  }
+  .animated-marker {
+    animation: blink 2s infinite; /* Adjust the animation duration as needed */
+  }
+  
+  @keyframes blink {
+    0%, 50%, 100% {
+      opacity: 0.5;
+    }
+    25%, 75% {
+      opacity: 0.25;
+    }
+  }

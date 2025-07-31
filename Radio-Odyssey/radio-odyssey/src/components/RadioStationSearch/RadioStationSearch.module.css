@@ -1,0 +1,108 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.window {
+  width: 80%;
+  max-width: 600px;
+  max-height: 80%;
+  background: #fff;
+  padding: 20px;
+  position: relative;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  overflow-y: auto;
+}
+
+.exitButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  background-color: #f44336;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.exitButton:hover {
+  background-color: #d32f2f;
+}
+
+.openButton {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  cursor: pointer;
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.openButton:hover {
+  background-color: #45a049;
+}
+
+.stationContainer {
+  overflow-y: auto;
+  max-height: calc(100% - 40px);
+}
+
+.stationDetails {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.stationDetails span {
+  border-right: 1px solid #ccc;
+  padding: 8px;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sortButtons {
+  margin-bottom: 16px;
+}
+
+.sortButtons button {
+  margin-right: 8px;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #2196F3;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.sortButtons button:hover {
+  background-color: #0b7dda;
+}
+
+.inputContainer {
+  margin-bottom: 16px;
+}
+
+.inputContainer input {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  margin-bottom: 8px;
+}
