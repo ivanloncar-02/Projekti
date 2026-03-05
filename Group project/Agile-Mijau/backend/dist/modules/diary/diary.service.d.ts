@@ -1,0 +1,33 @@
+import { Repository } from 'typeorm';
+import { DiaryEntry } from './entities/diary-entry.entity';
+import { CreateDiaryEntryDto } from './dto/create-diary-entry.dto';
+import { UpdateDiaryEntryDto } from './dto/update-diary-entry.dto';
+import { CompanyMentor } from '../mentors/entities/company-mentor.entity';
+import { AcademicMentor } from '../mentors/entities/academic-mentor.entity';
+import { Student } from '../students/entities/student.entity';
+import { Application } from '../applications/entities/application.entity';
+import { Internship } from '../internships/entities/internship.entity';
+import { NotificationsService } from '../notifications/notifications.service';
+import { UserRole } from '../../common/enums/user-role.enum';
+export declare class DiaryService {
+    private diaryRepository;
+    private companyMentorsRepository;
+    private academicMentorsRepository;
+    private studentsRepository;
+    private applicationsRepository;
+    private internshipsRepository;
+    private notificationsService;
+    constructor(diaryRepository: Repository<DiaryEntry>, companyMentorsRepository: Repository<CompanyMentor>, academicMentorsRepository: Repository<AcademicMentor>, studentsRepository: Repository<Student>, applicationsRepository: Repository<Application>, internshipsRepository: Repository<Internship>, notificationsService: NotificationsService);
+    create(studentId: string, createDiaryEntryDto: CreateDiaryEntryDto): Promise<DiaryEntry>;
+    private notifyAcademicMentor;
+    findAllByStudent(studentId: string): Promise<DiaryEntry[]>;
+    findAllByInternship(internshipId: string, userId?: string, role?: UserRole, studentId?: string): Promise<DiaryEntry[]>;
+    private verifyStudentAccess;
+    private verifyAcademicMentorAccess;
+    private verifyCompanyMentorAccess;
+    findOne(id: string): Promise<DiaryEntry>;
+    update(id: string, studentId: string, updateDiaryEntryDto: UpdateDiaryEntryDto): Promise<DiaryEntry>;
+    approveDiaryEntry(id: string, userId: string, comment?: string): Promise<DiaryEntry>;
+    delete(id: string, studentId: string): Promise<void>;
+    addComment(id: string, mentorUserId: string, comment: string): Promise<DiaryEntry>;
+}

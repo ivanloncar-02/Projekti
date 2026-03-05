@@ -1,0 +1,31 @@
+type: http_request
+model: http_request
+id: rq_internships_update_status
+createdAt: 2026-01-02T08:00:00
+updatedAt: 2026-01-02T08:00:00
+workspaceId: wk_SRYZSMLJsP
+folderId: null
+authentication:
+  token: <paste_jwt_token_here>
+authenticationType: bearer
+body:
+  text: |-
+    {
+      "status": "ACTIVE"
+    }
+bodyType: application/json
+description: Update internship status (Admin)
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: hdr_int_status
+method: PATCH
+name: Update Internship Status
+sortPriority: -1767336482496.0
+url: http://localhost:3000/api/internships/:id/status
+urlParameters:
+- enabled: true
+  name: id
+  value: <internship_uuid>
+  id: param_int_stat_id

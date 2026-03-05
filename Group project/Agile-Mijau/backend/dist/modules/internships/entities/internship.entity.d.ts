@@ -1,0 +1,31 @@
+import { InternshipStatus } from '../../../common/enums/internship-status.enum';
+import { Company } from '../../companies/entities/company.entity';
+import { Application } from '../../applications/entities/application.entity';
+import { User } from '../../users/entities/user.entity';
+export declare class Internship {
+    id: string;
+    companyId: string;
+    company: Company;
+    title: string;
+    description: string;
+    location: string;
+    duration: number;
+    requiredHours: number;
+    requiredSkills: string[];
+    salary: number | null;
+    startDate: Date;
+    endDate: Date;
+    status: InternshipStatus;
+    approvedBy: string | null;
+    approver: User | null;
+    approvedAt: Date | null;
+    archivedAt: Date | null;
+    grade: number | null;
+    gradeComment: string | null;
+    gradedBy: string | null;
+    grader: User | null;
+    gradedAt: Date | null;
+    applications: Application[];
+    createdAt: Date;
+    updatedAt: Date;
+}

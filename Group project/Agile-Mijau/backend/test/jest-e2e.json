@@ -1,0 +1,17 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": "e2e/.*\\.e2e-spec\\.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "setupFilesAfterEnv": ["./jest-setup.ts"],
+  "testTimeout": 30000,
+  "moduleNameMapper": {
+    "^src/(.*)$": "<rootDir>/../src/$1",
+    "^@helpers/(.*)$": "<rootDir>/helpers/$1",
+    "^@factories$": "<rootDir>/helpers/factories"
+  },
+  "maxWorkers": 1
+}

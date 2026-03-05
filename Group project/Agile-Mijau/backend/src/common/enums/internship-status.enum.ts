@@ -1,0 +1,9 @@
+export enum InternshipStatus {
+  DRAFT = 'DRAFT',
+  PUBLISHED = 'PUBLISHED',
+  ACTIVE = 'ACTIVE',
+  APPROVED = 'APPROVED',
+  COMPLETED = 'COMPLETED',
+  GRADED = 'GRADED',
+  ARCHIVED = 'ARCHIVED',
+}
