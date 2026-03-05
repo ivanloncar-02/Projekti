@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Transakcija {{ tx.txid[:10] }}...</title>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-dark bg-dark mb-4 shadow">
+        <div class="container"><a class="navbar-brand" href="/">← Početna</a></div>
+    </nav>
+
+    <div class="container pb-5">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h3 class="mb-0">Detalji Transakcije</h3>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr><th class="bg-light w-25">TXID</th><td class="font-monospace small text-break">{{ tx.txid }}</td></tr>
+                        <tr><th class="bg-light">Veličina (Size)</th><td>{{ tx.size }} bytes</td></tr>
+                        <tr><th class="bg-light">Verzija</th><td>{{ tx.version }}</td></tr>
+                        <tr><th class="bg-light">Locktime</th><td>{{ tx.locktime }}</td></tr>
+                        {% if tx.blockhash %}
+                        <tr><th class="bg-light">U bloku (Hash)</th><td><a href="/block/{{ tx.blockhash }}">{{ tx.blockhash[:64] }}</a></td></tr>
+                        {% endif %}
+                        <tr><th class="bg-light">Potvrde</th><td><span class="badge bg-success">{{ tx.confirmations if tx.confirmations else 0 }}</span></td></tr>
+                    </tbody>
+                </table>
+
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <h5>Inputi (Ulazi)</h5>
+                        <ul class="list-group small">
+                            {% for vin in tx.vin %}
+                            <li class="list-group-item bg-light text-truncate">
+                                {% if vin.coinbase %}
+                                <span class="badge bg-warning text-dark">Coinbase (Novo rudareni BTC)</span>
+                                {% else %}
+                                TX: {{ vin.txid[:15] }}... [Vout: {{ vin.vout }}]
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Outputi (Izlazi)</h5>
+                        <ul class="list-group small">
+                            {% for vout in tx.vout %}
+                            <li class="list-group-item">
+                                Vrijednost: <strong>{{ vout.value }} BTC</strong><br>
+                                <small class="text-muted">Adresa: {{ vout.scriptPubKey.address if vout.scriptPubKey.address else "N/A" }}</small>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
