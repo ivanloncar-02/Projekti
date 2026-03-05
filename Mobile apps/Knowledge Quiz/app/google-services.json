@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "622406180492",
+    "project_id": "kvizznanja-6a843",
+    "storage_bucket": "kvizznanja-6a843.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:622406180492:android:e9183191f390b1087565a9",
+        "android_client_info": {
+          "package_name": "com.example.kvizznanja"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "622406180492-1sme3p9movb4p0svskj1p8cqo9vogmm7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.kvizznanja",
+            "certificate_hash": "5cafd4e54cea668855c6a8331e653620525059f3"
+          }
+        },
+        {
+          "client_id": "622406180492-mc97j7237d18v4j2vodag0cmstco0mf8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQzm1nRxHBJ9nC0NpMsnxAUFTHE0E40b0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "622406180492-mc97j7237d18v4j2vodag0cmstco0mf8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

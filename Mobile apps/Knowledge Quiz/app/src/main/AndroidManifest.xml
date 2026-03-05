@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!-- Dozvole -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.KvizZnanja"
+        tools:targetApi="31">
+        <activity
+            android:name=".ui.players.PlayersAdapter"
+            android:exported="false" />
+        <activity
+            android:name=".ui.players.AllPlayersActivity"
+            android:exported="false" /> <!-- Login Activity - početni ekran -->
+        <activity
+            android:name=".ui.auth.LoginActivity"
+            android:exported="true"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity> <!-- Register Activity -->
+        <activity
+            android:name=".ui.auth.RegisterActivity"
+            android:screenOrientation="portrait" /> <!-- Main Activity -->
+        <activity
+            android:name=".ui.main.MainActivity"
+            android:screenOrientation="portrait" /> <!-- Quiz Activity -->
+        <activity
+            android:name=".ui.quiz.QuizActivity"
+            android:configChanges="orientation|screenSize"
+            android:screenOrientation="portrait" /> <!-- Celebration Activity -->
+        <activity
+            android:name=".ui.celebration.CelebrationActivity"
+            android:screenOrientation="portrait" /> <!-- Leaderboard Activity -->
+        <activity
+            android:name=".ui.leaderboard.LeaderboardActivity"
+            android:parentActivityName=".ui.main.MainActivity"
+            android:screenOrientation="portrait" /> <!-- Phone State Receiver -->
+        <receiver
+            android:name=".utils.PhoneStateReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.PHONE_STATE" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>
