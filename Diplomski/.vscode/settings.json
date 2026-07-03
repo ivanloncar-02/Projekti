@@ -1,0 +1,16 @@
+{
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}",
+        "${workspaceFolder}/app"
+    ],
+    "python.autoComplete.extraPaths": [
+        "${workspaceFolder}",
+        "${workspaceFolder}/app"
+    ],
+    "python.analysis.importFormat": "relative",
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportUndefinedVariable": "none",
+        "reportMissingImports": "warning",
+        "reportAttributeAccessIssue": "none"
+    }
+}

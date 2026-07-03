@@ -1,0 +1,39 @@
+/* ── templates_manage.html ───────────────────────────────── */
+.template-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 20px; }
+.template-card { border: 2px solid #dde3ee; border-radius: 8px; padding: 16px; background: #fff; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.template-card:hover  { border-color: #5b8cff; box-shadow: 0 2px 8px rgba(91,140,255,.18); }
+.template-card.active { border-color: #1a5cff; background: #f0f5ff; }
+.template-card h3 { margin: 0 0 6px; font-size: 14px; word-break: break-all; }
+.template-card p  { margin: 0; font-size: 12px; color: #666; }
+
+.badge-mikrotik { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; margin-bottom: 8px; background: #e6f9f0; color: #167a45; }
+
+#preview-box    { display: none; margin-top: 20px; border: 1px solid #c8d8ff; border-radius: 8px; padding: 16px; background: #f7f9ff; }
+#preview-box h3 { margin-top: 0; }
+
+pre#template-content { background: #1e1e2e; color: #e2e8f0; border-radius: 6px; padding: 14px; font-size: 12px; overflow-x: auto; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+
+/* ── templates_manage.html — deploy panel ────────────────── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+
+#deploy-panel   { display: none; margin-top: 20px; border: 1px solid #c8d8ff; border-radius: 8px; padding: 20px; background: #f7f9ff; }
+#deploy-panel h3 { margin-top: 0; }
+
+#deploy-log         { display: none; margin-top: 14px; background: #1e1e2e; color: #e2e8f0; border-radius: 6px; padding: 14px; font-family: monospace; font-size: 12px; white-space: pre-wrap; }
+#deploy-log.success { border: 1px solid #28a745; }
+#deploy-log.error   { border: 1px solid #dc3545; }
+
+.btn-deploy       { padding: 9px 26px; background: #1a5cff; color: #fff; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+.btn-deploy:hover { background: #0e45d6; }
+
+/* ── template_form.html ──────────────────────────────────── */
+.form-row textarea { width: 100%; padding: 8px 11px; border: 1px solid #ccc; border-radius: 5px; font-size: 12px; font-family: monospace; box-sizing: border-box; resize: vertical; min-height: 320px; background: #1e1e2e; color: #e2e8f0; line-height: 1.5; }
+
+.btn-save         { padding: 9px 26px; background: #1a5cff; color: #fff; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.btn-save:hover   { background: #0e45d6; }
+.btn-cancel       { padding: 9px 18px; background: #f5f5f5; border: 1px solid #aaa; border-radius: 6px; font-size: 14px; cursor: pointer; margin-left: 8px; color: #333; font-weight: 600; }
+.btn-cancel:hover { background: #e0e0e0; }
+
+#result-msg         { margin-top: 14px; padding: 10px 14px; border-radius: 6px; font-size: 13px; display: none; }
+#result-msg.success { background: #e6f9f0; color: #167a45; border: 1px solid #b2dfca; }
+#result-msg.error   { background: #fff0f0; color: #c0392b; border: 1px solid #ffb3b3; }

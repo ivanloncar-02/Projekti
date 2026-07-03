@@ -1,0 +1,54 @@
+/* ── Layout ─────────────────────────────────────────────── */
+body    { font-family: Arial, sans-serif; margin: 0; background: #f4f6fb; color: #1e2240; }
+.content { padding: 24px 28px; }
+.page   { max-width: 1000px; margin: 0 auto; }
+
+/* ── Nav ─────────────────────────────────────────────────── */
+nav            { padding: 10px 20px; background: #1e2240; display: flex; align-items: center; gap: 16px; }
+nav a          { color: #c8d8ff; text-decoration: none; font-size: 14px; }
+nav a:hover    { color: #fff; }
+nav .spacer    { flex: 1; }
+nav .user-info { color: #8899cc; font-size: 13px; }
+nav .logout-btn{ color: #ff7070; font-size: 13px; cursor: pointer; background: none; border: none; }
+
+/* ── Tables ──────────────────────────────────────────────── */
+table          { width: 100%; border-collapse: collapse; }
+th, td         { padding: 9px 12px; text-align: left; border-bottom: 1px solid #e8e8e8; font-size: 13px; }
+th             { background: #f5f7ff; font-weight: 600; }
+tr:hover td    { background: #fafbff; }
+
+/* ── Badges ──────────────────────────────────────────────── */
+.badge      { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+.badge-ok   { background: #e6f9f0; color: #167a45; }
+.badge-err  { background: #fff0f0; color: #c0392b; }
+.badge-info { background: #f0f4ff; color: #1a5cff; }
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.btn               { padding: 8px 18px; border: none; border-radius: 5px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-primary       { background: #1a5cff; color: #fff; }
+.btn-primary:hover { background: #0e45d6; }
+.btn-secondary     { background: #fff; border: 1px solid #aaa; color: #333; }
+.btn-secondary:hover { background: #f0f0f0; }
+
+.btn-refresh       { padding: 6px 14px; background: #f0f5ff; border: 1px solid #1a5cff; border-radius: 5px; font-size: 13px; cursor: pointer; color: #1a5cff; font-weight: 600; }
+.btn-refresh:hover { background: #1a5cff; color: #fff; }
+
+/* ── Section header ──────────────────────────────────────── */
+.section-header    { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.section-header h3 { margin: 0; }
+
+/* ── Status bar (GNS3 spojen / nije) ─────────────────────── */
+.status-bar       { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 6px; margin-bottom: 20px; background: #f0f4ff; border: 1px solid #c8d8ff; }
+.status-bar.error { background: #fff0f0; border-color: #ffc8c8; }
+.dot              { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; background: #28a745; }
+.dot.red          { background: #dc3545; }
+
+/* ── Forms ───────────────────────────────────────────────── */
+.form-row               { margin-bottom: 14px; }
+.form-row label         { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.form-row input,
+.form-row select        { width: 100%; padding: 7px 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 13px; box-sizing: border-box; }
+.params-grid            { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+
+/* ── Code / pre blocks ───────────────────────────────────── */
+.code-dark              { background: #1e1e2e; color: #e2e8f0; border-radius: 6px; padding: 14px; font-size: 12px; overflow-x: auto; white-space: pre-wrap; }

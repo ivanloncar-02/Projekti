@@ -1,0 +1,6 @@
+.actions    { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+.no-devices { text-align: center; padding: 30px; color: #888; font-style: italic; }
+
+#sync-log         { display: none; margin-top: 14px; padding: 10px 14px; border-radius: 6px; font-size: 13px; }
+#sync-log.success { background: #e6f9f0; color: #167a45; border: 1px solid #a3e4c1; }
+#sync-log.error   { background: #fff0f0; color: #c0392b; border: 1px solid #f5b7b1; }

@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/topology.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="topo-page">
+
+  <div class="status-bar {% if not gns3_ok %}error{% endif %}">
+    <div class="dot {% if not gns3_ok %}red{% endif %}"></div>
+    {% if gns3_ok %}
+      <strong>GNS3 spojen</strong>&nbsp;·&nbsp;{{ topo.nodes | length }} nodeova, {{ topo.links | length }} linkova
+    {% else %}
+      <strong>GNS3 nije dostupan</strong> — provjeri je li GNS3 Server pokrenut
+    {% endif %}
+    <button class="btn-refresh" onclick="window.location.reload()">↻ Osvježi</button>
+  </div>
+
+  <h2>Mrežna topologija</h2>
+
+  <div id="topology-canvas"></div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#1a73e8"></div> MikroTik RouterOS
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#6c757d"></div> Drugi uređaj
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#28a745; width:10px; height:10px; border-radius:0; transform:rotate(45deg)"></div> Pokrenut
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#dc3545; width:10px; height:10px; border-radius:0; transform:rotate(45deg)"></div> Zaustavljen
+    </div>
+  </div>
+
+  <div class="info-panels">
+    <div class="info-panel">
+      <h4>Nodeovi ({{ topo.nodes | length }})</h4>
+      {% if topo.nodes %}
+      <table>
+        <thead>
+          <tr><th>Naziv</th><th>Tip</th><th>Status</th><th>Konzola</th></tr>
+        </thead>
+        <tbody>
+          {% for n in topo.nodes %}
+          <tr>
+            <td><strong>{{ n.name }}</strong></td>
+            <td>{{ n.node_type }}</td>
+            <td class="status-{{ n.status }}">{{ n.status }}</td>
+            <td>
+              {% if n.console_port %}
+                {{ n.console_host }}:{{ n.console_port }}
+              {% else %}—{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p style="color:#888; font-style:italic">Nema nodeova u projektu.</p>
+      {% endif %}
+    </div>
+
+    <div class="info-panel">
+      <h4>Linkovi ({{ topo.links | length }})</h4>
+      {% if topo.links %}
+      <table>
+        <thead>
+          <tr><th>#</th><th>Od</th><th>Do</th><th>Tip</th></tr>
+        </thead>
+        <tbody>
+          {% set node_names = {} %}
+          {% for n in topo.nodes %}{% if node_names.update({n.node_id: n.name}) %}{% endif %}{% endfor %}
+          {% for l in topo.links %}
+          <tr>
+            <td style="color:#999">{{ loop.index }}</td>
+            <td><strong>{{ node_names.get(l.from_node, l.from_node[:8] ~ '…') }}</strong></td>
+            <td><strong>{{ node_names.get(l.to_node, l.to_node[:8] ~ '…') }}</strong></td>
+            <td>{{ l.link_type }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p style="color:#888; font-style:italic">Nema linkova u projektu.</p>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+<!-- vis-network za vizualizaciju topologije -->
+<script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+<script>
+const NODES_DATA = {{ topo.nodes | tojson | safe }};
+const LINKS_DATA = {{ topo.links | tojson | safe }};
+
+function statusColor(status) {
+  if (status === 'started')   return '#28a745';
+  if (status === 'stopped')   return '#dc3545';
+  if (status === 'suspended') return '#e67e22';
+  return '#6c757d';
+}
+
+const visNodes = NODES_DATA.map(n => ({
+  id:    n.node_id,
+  label: n.name,
+  color: {
+    background: n.is_mikrotik ? '#dbeafe' : '#f0f0f0',
+    border:     statusColor(n.status),
+    highlight:  { background: '#fff3cd', border: '#f0ad4e' },
+  },
+  font:       { size: 13, color: '#1e2240' },
+  borderWidth: 2,
+  shape:      n.is_mikrotik ? 'box' : 'ellipse',
+  title:      `${n.name}\nStatus: ${n.status}\nTip: ${n.node_type}${n.console_port ? '\nKonzola: ' + n.console_host + ':' + n.console_port : ''}`,
+  x: n.x || null,
+  y: n.y || null,
+}));
+
+const visEdges = LINKS_DATA.map(l => ({
+  from:  l.from_node,
+  to:    l.to_node,
+  color: { color: '#94a3b8' },
+  width: 2,
+  title: `Port ${l.from_port} ↔ Port ${l.to_port}`,
+}));
+
+const container = document.getElementById('topology-canvas');
+
+if (visNodes.length === 0) {
+  container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#888;font-style:italic">Nema nodeova za prikaz.</div>';
+} else {
+  const data    = { nodes: new vis.DataSet(visNodes), edges: new vis.DataSet(visEdges) };
+  const options = {
+    physics: { enabled: true, stabilization: { iterations: 150 } },
+    interaction: { hover: true, tooltipDelay: 200 },
+    layout: { randomSeed: 42 },
+  };
+  new vis.Network(container, data, options);
+}
+</script>
+
+{% endblock %}

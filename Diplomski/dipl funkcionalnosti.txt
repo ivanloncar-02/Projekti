@@ -1,0 +1,45 @@
+1. Prijava i korisnički pristup
+prijava korisnika u sustav
+odjava korisnika iz sustava
+kontrola pristupa prema korisničkoj ulozi
+
+2. Upravljanje mrežnim uređajima
+prikaz svih uređaja u mreži
+detekcija uređaja u mreži
+prikaz statusa uređaja : provjera jesu li uređaji konfigurirani, pregled osnovnih informacija o uređaju
+
+3. Generiranje i upravljanje konfiguracijama
+izrada konfiguracijskih skripti za mrežne uređaje
+korištenje predložaka za različite tipove uređaja
+pregled spremljenih konfiguracijskih predložaka
+
+4. Deployment konfiguracije
+isporuka konfiguracije mrežnim uređajima
+prilagodba konfiguracije ovisno o tipu uređaja
+
+5. Praćenje statusa konfiguracije
+provjera uspješnosti deployanja konfiguracije
+prikaz grešaka tijekom deployanja
+pregled konfiguracijskog statusa
+
+6. Evidencija promjena i aktivnosti
+bilježenje svih promjena u sustavu
+praćenje aktivnosti po korisniku
+praćenje promjena po uređaju
+zapis vremena promjene
+
+7. Statistika i izvještaji
+prikaz broja konfiguriranih uređaja
+prikaz broja nekonfiguriranih uređaja
+pregled tipova uređaja u mreži
+pregled dodanih i izmijenjenih konfiguracija
+generiranje izvještaja o korisničkim aktivnostima
+izvoz izvještaja u PDF obliku
+
+8. Simulacija i testiranje mreže
+emulacija mrežnih uređaja u GNS3 okruženju
+izrada i prikaz mrežne topologije
+povezivanje GNS3 okruženja s lokalnom mrežom
+korištenje virtualnih mrežnih sučelja
+konfiguracija DHCP usluge unutar testne mreže
+testiranje deployment procesa u simuliranom okruženju

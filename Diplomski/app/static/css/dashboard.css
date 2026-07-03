@@ -1,0 +1,9 @@
+.stats      { display: flex; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+.stat-card  { flex: 1; min-width: 160px; padding: 20px 24px; border-radius: 8px; border: 1px solid #dde3ee; background: #fff; text-align: center; }
+.stat-card .number { font-size: 36px; font-weight: 700; margin-bottom: 4px; }
+.stat-card .label  { font-size: 13px; color: #666; }
+.stat-card.green .number { color: #167a45; }
+.stat-card.red   .number { color: #c0392b; }
+.stat-card.blue  .number { color: #1a5cff; }
+
+.no-logs    { text-align: center; padding: 20px; color: #888; font-style: italic; }

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/devices.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="page">
+  <h2>Mrežni uređaji</h2>
+
+  <div class="actions">
+    <button class="btn btn-primary" onclick="osvjeziUredaje()">↻ Osvježi uređaje</button>
+  </div>
+
+  <div id="sync-log"></div>
+
+  {% if devices %}
+  <table>
+    <thead>
+      <tr>
+        <th>Hostname</th>
+        <th>IP Adresa</th>
+        <th>MAC Adresa</th>
+        <th>Tip Uređaja</th>
+        <th>Status</th>
+        <th>Zadnji Deployment</th>
+        <th>Zadnji put viđen</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in devices %}
+      <tr>
+        <td>{{ d.hostname or '—' }}</td>
+        <td><code>{{ d.ip_address }}</code></td>
+        <td><code>{{ d.mac_address or '—' }}</code></td>
+        <td>{{ d.device_type }}</td>
+        <td>
+          {% if d.status == 'konfiguriran' %}
+            <span class="badge badge-ok">✓ konfiguriran</span>
+          {% else %}
+            <span class="badge badge-err">✗ nekonfiguriran</span>
+          {% endif %}
+          {% if d.gns3_status %}
+            <div style="font-size:10px; color:#888; margin-top:2px">
+              GNS3: {{ d.gns3_status }}
+            </div>
+          {% endif %}
+        </td>
+        <td style="font-size:12px">
+          {% if d.last_deploy_time %}
+            <div>
+              {% if d.last_deploy_status == 'uspjeh' %}
+                <span class="badge badge-ok" style="font-size:10px">✓ uspjeh</span>
+              {% else %}
+                <span class="badge badge-err" style="font-size:10px">✗ greška</span>
+              {% endif %}
+            </div>
+            <div style="color:#777; margin-top:2px">
+              {{ d.last_deploy_template or '—' }}
+            </div>
+            {% if d.last_deploy_status == 'greska' and d.last_deploy_message %}
+            <div style="color:#c0392b; font-size:11px; margin-top:2px" title="{{ d.last_deploy_message }}">
+              {{ d.last_deploy_message[:60] }}{% if d.last_deploy_message|length > 60 %}…{% endif %}
+            </div>
+            {% endif %}
+          {% else %}
+            <span style="color:#bbb">—</span>
+          {% endif %}
+        </td>
+        <td style="font-size:12px; color:#777">
+          {{ d.last_seen.strftime('%d.%m.%Y %H:%M') if d.last_seen and d.last_seen.strftime is defined else d.last_seen or '—' }}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="no-devices">
+    Nema uređaja u bazi.<br>
+    Klikni <strong>Osvježi uređaje</strong> za sinkronizaciju s GNS3.
+  </div>
+  {% endif %}
+</div>
+
+<script>
+function osvjeziUredaje() {
+  showLog('⏳ Sinkronizacija s GNS3...', '');
+  fetch('/devices/sync-gns3', { method: 'POST' })
+  .then(r => r.json())
+  .then(data => {
+    if (data.status === 'success') {
+      showLog(`✅ Sinkronizirano ${data.synced} uređaja iz GNS3.`, 'success');
+      setTimeout(() => location.reload(), 1200);
+    } else {
+      showLog('❌ ' + data.message, 'error');
+    }
+  })
+  .catch(e => showLog('❌ Greška: ' + e, 'error'));
+}
+
+function showLog(msg, cls) {
+  const el = document.getElementById('sync-log');
+  el.textContent = msg;
+  el.className = cls;
+  el.style.display = 'block';
+}
+</script>
+
+{% endblock %}

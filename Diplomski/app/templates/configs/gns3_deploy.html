@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gns3_deploy.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="gns3-page">
+
+  <div class="status-bar {% if not gns3_ok %}error{% endif %}">
+    <div class="dot {% if not gns3_ok %}red{% endif %}"></div>
+    {% if gns3_ok %}
+      <strong>GNS3 spojen</strong>
+    {% else %}
+      <strong>GNS3 nije dostupan</strong> — provjeri je li GNS3 Server pokrenut
+    {% endif %}
+    <button class="btn-refresh" onclick="syncAndReload()" style="margin-left:auto">↻ Osvježi</button>
+  </div>
+
+  <h2>GNS3 — MikroTik Deployment</h2>
+  <p style="color:#555; margin-top:-8px; margin-bottom:16px">
+    Odaberi MikroTik router iz aktivnog GNS3 projekta, zatim predložak i parametre.
+  </p>
+
+  <div class="routers-grid" id="routers-grid">
+    {% if routers %}
+      {% for r in routers %}
+      <div class="router-card" id="card-{{ r.node_id }}"
+           data-router='{{ r | tojson | safe }}'
+           onclick="handleCardClick(this)">
+        <div class="status-dot status-{{ r.status }}"></div>
+        <span class="badge-mikrotik">MikroTik RouterOS</span>
+        <h3>{{ r.name }}</h3>
+        <p>Status: <strong>{{ r.status }}</strong></p>
+        <p>IP: {{ r.ip_address or '—' }}</p>
+        <p>Konzola: {{ r.console_host }}:{{ r.console_port or '—' }}</p>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="no-routers">
+        {% if gns3_ok %}
+          Nema MikroTik routera u aktivnom projektu.
+        {% else %}
+          GNS3 nije dostupan — routeri se ne mogu dohvatiti.
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+
+  <div id="config-panel">
+    <h3 id="panel-title">Konfiguracija za: —</h3>
+
+    {% if templates %}
+    <div class="form-row">
+      <label>Predložak</label>
+      <select id="template-select" onchange="onTemplateChange()">
+        <option value="">— odaberi predložak —</option>
+        {% for t in templates %}
+        <option value="{{ t.id }}" data-content="{{ t.content | e }}">{{ t.name }} ({{ t.device_type }})</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% else %}
+    <div class="no-templates">
+      Nema predložaka u bazi. Dodaj predložak na stranici
+      <a href="/configs/templates">Konfiguracijski predlošci</a>.
+    </div>
+    {% endif %}
+
+    <div class="form-row">
+      <label>SSH pristup</label>
+      <div class="params-grid">
+        <div class="form-row"><label>IP adresa</label><input type="text" id="ssh-host" placeholder="192.168.56.200"></div>
+        <div class="form-row"><label>Port</label><input type="number" id="ssh-port" value="22"></div>
+        <div class="form-row"><label>Korisničko ime</label><input type="text" id="ssh-user" value="admin"></div>
+        <div class="form-row"><label>Lozinka</label><input type="password" id="ssh-pass"></div>
+      </div>
+    </div>
+
+    <div id="params-section" style="display:none">
+      <hr>
+      <h4 style="margin-bottom:10px">Parametri konfiguracije</h4>
+      <p style="font-size:12px; color:#777; margin-top:-6px">
+        Varijable su automatski detektirane iz sadržaja predloška.
+      </p>
+      <div class="params-grid" id="params-grid"></div>
+    </div>
+
+    <button class="btn-deploy" onclick="doDeploy()">Pošalji konfiguraciju</button>
+    <pre id="deploy-log"></pre>
+  </div>
+
+</div>
+
+<script>
+function syncAndReload() {
+  const btn = document.querySelector('.btn-refresh');
+  btn.textContent = '⏳ Sinkronizacija s GNS3...';
+  btn.disabled = true;
+  fetch('/devices/sync-gns3', { method: 'POST' })
+    .finally(() => window.location.reload());
+}
+
+let selectedRouter     = null;
+let selectedTemplateId = null;
+
+function handleCardClick(el) {
+  selectedRouter = JSON.parse(el.getAttribute('data-router'));
+  document.querySelectorAll('.router-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+
+  document.getElementById('panel-title').textContent = 'Konfiguracija za: ' + selectedRouter.name;
+  document.getElementById('ssh-host').value = selectedRouter.ip_address || '';
+  document.getElementById('config-panel').style.display = 'block';
+  document.getElementById('params-section').style.display = 'none';
+  document.getElementById('params-grid').innerHTML = '';
+  const sel = document.getElementById('template-select');
+  if (sel) sel.value = '';
+  selectedTemplateId = null;
+  hideLog();
+  window.scrollTo({ top: document.getElementById('config-panel').offsetTop - 20, behavior: 'smooth' });
+}
+
+function onTemplateChange() {
+  const sel     = document.getElementById('template-select');
+  const opt     = sel.options[sel.selectedIndex];
+  const section = document.getElementById('params-section');
+  const grid    = document.getElementById('params-grid');
+  grid.innerHTML = '';
+  hideLog();
+
+  if (!opt || !opt.value) {
+    section.style.display = 'none';
+    selectedTemplateId = null;
+    return;
+  }
+
+  selectedTemplateId = opt.value;
+  const content = opt.getAttribute('data-content') || '';
+
+  // Automatski detektiraj Jinja2 varijable iz sadržaja predloška
+  const varRegex = /\{\{\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\}\}/g;
+  const vars = new Set();
+  let m;
+  while ((m = varRegex.exec(content)) !== null) {
+    vars.add(m[1]);
+  }
+
+  if (vars.size === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  vars.forEach(v => {
+    const row = document.createElement('div');
+    row.className = 'form-row';
+    const { label, placeholder } = varMeta(v);
+    row.innerHTML = `<label>${label}</label><input type="text" id="param-${v}" placeholder="${placeholder}">`;
+    grid.appendChild(row);
+  });
+  section.style.display = 'block';
+}
+
+function varMeta(varName) {
+  const v = varName.toLowerCase();
+  if (v === 'hostname' || v === 'name') {
+    return { label: `${varName} (naziv uređaja)`, placeholder: 'npr. MikroTik-Router-1' };
+  }
+  if (v.includes('interface') || v.endsWith('_if') || v === 'wan' || v === 'lan') {
+    return { label: `${varName} (sučelje)`, placeholder: 'npr. ether1' };
+  }
+  if (v.includes('cidr') || v.includes('ip') || v.includes('address') || v.includes('subnet')) {
+    return { label: `${varName} (IP adresa/CIDR)`, placeholder: 'npr. 192.168.1.1/24' };
+  }
+  if (v.includes('gateway') || v.includes('gw')) {
+    return { label: `${varName} (gateway)`, placeholder: 'npr. 192.168.1.1' };
+  }
+  if (v.includes('dns')) {
+    return { label: `${varName} (DNS)`, placeholder: 'npr. 8.8.8.8' };
+  }
+  if (v.includes('pool') || v.includes('range')) {
+    return { label: `${varName} (raspon adresa)`, placeholder: 'npr. 10.0.0.10-10.0.0.254' };
+  }
+  return { label: varName, placeholder: varName };
+}
+
+
+function doDeploy() {
+  if (!selectedRouter)     { alert('Odaberi router.');    return; }
+  if (!selectedTemplateId) { alert('Odaberi predložak.'); return; }
+
+  // Prikupi parametre
+  const params = {};
+  document.querySelectorAll('#params-grid input').forEach(inp => {
+    const key = inp.id.replace('param-', '');
+    params[key] = inp.value;
+  });
+
+  const host = document.getElementById('ssh-host').value.trim();
+  if (!host) { alert('Upiši IP adresu.'); return; }
+
+  const payload = {
+    node_name:     selectedRouter.name,
+    node_id:       selectedRouter.node_id,
+    template_id:   selectedTemplateId,
+    params:        params,
+    access_method: 'ssh',
+    host:          host,
+    port:          parseInt(document.getElementById('ssh-port').value) || 22,
+    username:      document.getElementById('ssh-user').value,
+    password:      document.getElementById('ssh-pass').value,
+  };
+
+  const log = document.getElementById('deploy-log');
+  log.className = '';
+  log.textContent = 'Šaljem konfiguraciju na ' + selectedRouter.name + '...';
+  log.style.display = 'block';
+
+  fetch('/deploy/gns3/push', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload),
+  })
+  .then(r => r.json())
+  .then(data => {
+    log.className   = data.status === 'success' ? 'success' : 'error';
+    log.textContent = data.status === 'success' ? '✅ ' + data.message : '❌ ' + data.message;
+  })
+  .catch(err => {
+    log.className = 'error';
+    log.textContent = '❌ Mrežna greška: ' + err;
+  });
+}
+
+function hideLog() {
+  const log = document.getElementById('deploy-log');
+  log.style.display = 'none';
+  log.textContent = '';
+  log.className = '';
+}
+</script>
+
+{% endblock %}

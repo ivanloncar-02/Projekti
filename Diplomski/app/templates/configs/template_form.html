@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/templates.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="page">
+  <h2>{% if template %}Uredi predložak{% else %}Novi predložak{% endif %}</h2>
+
+  <div class="form-row">
+    <label>Naziv predloška</label>
+    <input type="text" id="f-name"
+           value="{{ template.name if template else '' }}"
+           placeholder="npr. mikrotik_ros_init_base_v1_0.j2">
+  </div>
+
+  <div class="form-row">
+    <label>Tip uređaja</label>
+    <select id="f-device-type">
+      <option value="mikrotik_routeros" {% if template and template.device_type == 'mikrotik_routeros' %}selected{% endif %}>
+        mikrotik_routeros
+      </option>
+    </select>
+  </div>
+
+  <div class="form-row">
+    <label>Sadržaj predloška (Jinja2)</label>
+    <textarea id="f-content" placeholder="/ip address add address={{ '{{' }} wan_ip_cidr {{ '}}' }} interface={{ '{{' }} wan_interface {{ '}}' }}">{{ template.content if template else '' }}</textarea>
+  </div>
+
+  <button class="btn-save" onclick="saveTemplate()">
+    {% if template %}Spremi izmjene{% else %}Dodaj predložak{% endif %}
+  </button>
+  <button class="btn-cancel" onclick="window.location='/configs/templates'">Odustani</button>
+
+  <div id="result-msg"></div>
+</div>
+
+<div id="form-meta"
+     data-is-edit="{{ 'true' if template else 'false' }}"
+     data-doc-id="{{ template.id if template else '' }}"
+     style="display:none"></div>
+
+<script>
+const _meta   = document.getElementById('form-meta').dataset;
+const IS_EDIT = _meta.isEdit === 'true';
+const DOC_ID  = _meta.docId || null;
+const SAVE_URL = IS_EDIT
+  ? `/configs/templates/${DOC_ID}/edit`
+  : '/configs/templates/new';
+
+function saveTemplate() {
+  const name        = document.getElementById('f-name').value.trim();
+  const device_type = document.getElementById('f-device-type').value;
+  const content     = document.getElementById('f-content').value.trim();
+
+  if (!name || !content) {
+    showMsg('error', 'Naziv i sadržaj predloška su obavezni.');
+    return;
+  }
+
+  fetch(SAVE_URL, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ name, device_type, content }),
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.status === 'success') {
+      showMsg('success', IS_EDIT ? 'Predložak uspješno ažuriran.' : 'Predložak uspješno dodan.');
+      setTimeout(() => window.location = '/configs/templates', 1200);
+    } else {
+      showMsg('error', data.message || 'Greška pri spremanju.');
+    }
+  })
+  .catch(() => showMsg('error', 'Mrežna greška.'));
+}
+
+function showMsg(type, text) {
+  const el = document.getElementById('result-msg');
+  el.className = type;
+  el.textContent = (type === 'success' ? '✓ ' : '✗ ') + text;
+  el.style.display = 'block';
+}
+</script>
+
+{% endblock %}

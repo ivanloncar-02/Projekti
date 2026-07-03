@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/templates.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="page">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px">
+    <h2 style="margin:0">Konfiguracijski Predlošci</h2>
+    <a href="/configs/templates/new">
+      <button style="padding:7px 16px; background:#1a5cff; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:13px; font-weight:600">
+        + Novi predložak
+      </button>
+    </a>
+  </div>
+  <p style="color:#555; margin-top:6px">
+    Odaberi predložak, popuni parametre i pošalji konfiguraciju direktno na uređaj.
+  </p>
+
+  {% if templates %}
+  <div class="template-grid">
+    {% for t in templates %}
+    <div class="template-card" id="tcard-{{ t.id }}"
+         onclick="selectTemplate('{{ t.id }}', '{{ t.name }}', '{{ t.content | tojson }}')">
+      <span class="badge-mikrotik">{{ t.device_type }}</span>
+      <h3>{{ t.name }}</h3>
+      <p>Tip: {{ t.device_type }}</p>
+      <div style="margin-top:8px; display:flex; gap:6px" onclick="event.stopPropagation()">
+        <a href="/configs/templates/{{ t.id }}/edit">
+          <button style="padding:3px 10px; font-size:11px; border:1px solid #1a5cff; border-radius:4px; cursor:pointer; background:#f0f5ff; color:#1a5cff; font-weight:600">
+            Uredi
+          </button>
+        </a>
+        <button onclick="deleteTemplate('{{ t.id }}', '{{ t.name }}')"
+                style="padding:3px 10px; font-size:11px; border:1px solid #ffb3b3; border-radius:4px; cursor:pointer; background:#fff0f0; color:#c0392b">
+          Briši
+        </button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="no-templates">
+    Nema predložaka u bazi.<br>
+    Dodaj novi predložak gumbom iznad ili pokreni <code>python import_templates.py</code>.
+  </div>
+  {% endif %}
+
+  <div id="delete-msg" style="display:none; margin-top:12px; padding:10px 14px; border-radius:6px; font-size:13px"></div>
+
+  <div id="preview-box">
+    <h3 id="preview-title">Sadržaj predloška</h3>
+    <pre id="template-content"></pre>
+  </div>
+
+  <div id="deploy-panel">
+    <h3>Deployment: <span id="deploy-title" style="color:#1a5cff"></span></h3>
+
+    {% if devices %}
+    <div class="form-row">
+      <label>Odaberi uređaj iz baze (ili upiši IP ručno ispod)</label>
+      <select id="device-select" onchange="onDeviceSelect()">
+        <option value="">— odaberi uređaj —</option>
+        {% for d in devices %}
+        <option value="{{ d.ip_address }}">
+          {{ d.hostname or d.ip_address }} — {{ d.ip_address }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endif %}
+
+    <div class="form-grid">
+      <div class="form-row">
+        <label>IP adresa uređaja</label>
+        <input type="text" id="host" placeholder="192.168.56.200">
+      </div>
+      <div class="form-row">
+        <label>Port</label>
+        <input type="number" id="port" value="22">
+      </div>
+      <div class="form-row">
+        <label>Korisničko ime</label>
+        <input type="text" id="username" value="admin">
+      </div>
+      <div class="form-row">
+        <label>Lozinka</label>
+        <input type="password" id="password">
+      </div>
+    </div>
+
+    <hr>
+
+    <div id="params-section">
+      <h4 style="margin-bottom:10px">Parametri konfiguracije</h4>
+      <div class="form-grid" id="params-grid"></div>
+    </div>
+
+    <button class="btn-deploy" onclick="doDeploy()">🚀 Pošalji konfiguraciju</button>
+    <pre id="deploy-log"></pre>
+  </div>
+</div>
+
+<script>
+const TEMPLATE_FIELDS = {
+  'mikrotik_ros_service_dhcp_v1_0.j2': [
+    { key: 'dhcp_pool_name',   label: 'Naziv DHCP poola',   default: 'LAN_POOL' },
+    { key: 'dhcp_range',       label: 'Raspon DHCP adresa', default: '10.0.20.10-10.0.20.254' },
+    { key: 'lan_network_cidr', label: 'LAN mreža (CIDR)',   default: '10.0.20.0/24' },
+    { key: 'lan_gateway',      label: 'Gateway',            default: '10.0.20.1' },
+    { key: 'lan_interface',    label: 'LAN sučelje',        default: 'ether2' },
+    { key: 'dns_primary',      label: 'Primarni DNS',       default: '8.8.8.8' },
+    { key: 'dns_secondary',    label: 'Sekundarni DNS',     default: '1.1.1.1' },
+  ],
+  'mikrotik_ros_init_base_v1_0.j2': [
+    { key: 'hostname',      label: 'Hostname',       default: 'MikroTik-GNS3' },
+    { key: 'wan_interface', label: 'WAN sučelje',    default: 'ether1' },
+    { key: 'wan_ip_cidr',   label: 'WAN IP (CIDR)',  default: '192.168.56.200/24' },
+    { key: 'lan_interface', label: 'LAN sučelje',    default: 'ether2' },
+    { key: 'lan_ip_cidr',   label: 'LAN IP (CIDR)',  default: '10.0.20.1/24' },
+  ],
+};
+
+let selectedTemplate = null;
+
+function deleteTemplate(docId, name) {
+  if (!confirm(`Obriši predložak "${name}"?`)) return;
+  fetch(`/configs/templates/${docId}/delete`, { method: 'POST' })
+    .then(r => r.json())
+    .then(data => {
+      const msg = document.getElementById('delete-msg');
+      if (data.status === 'success') {
+        msg.style.display = 'block';
+        msg.style.background = '#e6f9f0';
+        msg.style.border = '1px solid #b2dfca';
+        msg.style.color = '#167a45';
+        msg.textContent = `✓ Predložak "${name}" obrisan.`;
+        document.getElementById('tcard-' + docId)?.closest('.template-card')?.remove() ||
+          setTimeout(() => window.location.reload(), 800);
+      } else {
+        msg.style.display = 'block';
+        msg.style.background = '#fff0f0';
+        msg.style.border = '1px solid #ffb3b3';
+        msg.style.color = '#c0392b';
+        msg.textContent = '✗ ' + (data.message || 'Greška pri brisanju.');
+      }
+    })
+    .catch(() => alert('Mrežna greška.'));
+}
+
+function selectTemplate(id, name, content) {
+  document.querySelectorAll('.template-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('tcard-' + id).classList.add('active');
+  selectedTemplate = { id, name };
+
+  document.getElementById('preview-title').textContent = name;
+  document.getElementById('template-content').textContent = content;
+  document.getElementById('preview-box').style.display = 'block';
+  document.getElementById('deploy-title').textContent = name;
+
+  const fields = TEMPLATE_FIELDS[name] || [];
+  const grid = document.getElementById('params-grid');
+  grid.innerHTML = '';
+  fields.forEach(f => {
+    const row = document.createElement('div');
+    row.className = 'form-row';
+    row.innerHTML = `<label>${f.label}</label><input type="text" id="param-${f.key}" value="${f.default}">`;
+    grid.appendChild(row);
+  });
+
+  document.getElementById('deploy-panel').style.display = 'block';
+  hideLog();
+  window.scrollTo({ top: document.getElementById('preview-box').offsetTop - 20, behavior: 'smooth' });
+}
+
+function onDeviceSelect() {
+  const sel = document.getElementById('device-select');
+  const opt = sel.options[sel.selectedIndex];
+  if (opt && opt.value) document.getElementById('host').value = opt.value;
+}
+
+function doDeploy() {
+  if (!selectedTemplate) { alert('Odaberi predložak.'); return; }
+  const host = document.getElementById('host').value.trim();
+  if (!host) { alert('Upiši IP adresu uređaja.'); return; }
+
+  const fields = TEMPLATE_FIELDS[selectedTemplate.name] || [];
+  const params = {};
+  fields.forEach(f => {
+    const el = document.getElementById('param-' + f.key);
+    if (el) params[f.key] = el.value;
+  });
+
+  const payload = {
+    template_name: selectedTemplate.name,
+    device_type:   'mikrotik_routeros',
+    host,
+    port:     parseInt(document.getElementById('port').value) || 22,
+    username: document.getElementById('username').value,
+    password: document.getElementById('password').value,
+    params,
+  };
+
+  const log = document.getElementById('deploy-log');
+  log.className = '';
+  log.textContent = '⏳ Šaljem konfiguraciju na ' + host + '...';
+  log.style.display = 'block';
+
+  fetch('/configs/deploy-template', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+  .then(r => r.json())
+  .then(data => {
+    log.className   = data.status === 'success' ? 'success' : 'error';
+    log.textContent = data.status === 'success' ? '✅ ' + data.message : '❌ ' + data.message;
+  })
+  .catch(err => {
+    log.className = 'error';
+    log.textContent = '❌ Mrežna greška: ' + err;
+  });
+}
+
+function hideLog() {
+  const log = document.getElementById('deploy-log');
+  log.style.display = 'none';
+  log.textContent = '';
+  log.className = '';
+}
+</script>
+
+{% endblock %}

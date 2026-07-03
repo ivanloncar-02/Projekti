@@ -1,0 +1,28 @@
+.gns3-page { max-width: 960px; margin: 0 auto; }
+
+.routers-grid  { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 16px; margin-bottom: 28px; }
+.router-card   { border: 2px solid #dde3ee; border-radius: 8px; padding: 14px 16px; cursor: pointer; transition: border-color .15s, box-shadow .15s; background: #fff; position: relative; }
+.router-card:hover    { border-color: #5b8cff; box-shadow: 0 2px 8px rgba(91,140,255,.18); }
+.router-card.selected { border-color: #1a5cff; background: #f0f5ff; }
+.router-card h3 { margin: 0 0 6px; font-size: 15px; }
+.router-card p  { margin: 2px 0; font-size: 12px; color: #555; }
+
+.badge-mikrotik { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; margin-bottom: 6px; background: #e6f9f0; color: #167a45; }
+
+.status-dot       { position: absolute; top: 12px; right: 12px; width: 9px; height: 9px; border-radius: 50%; }
+.status-started   { background: #28a745; }
+.status-stopped   { background: #dc3545; }
+.status-suspended { background: #ffc107; }
+
+#config-panel   { border: 1px solid #c8d8ff; border-radius: 8px; padding: 20px; background: #f7f9ff; display: none; }
+#config-panel h3 { margin-top: 0; }
+
+.btn-deploy       { padding: 9px 26px; background: #1a5cff; color: #fff; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+.btn-deploy:hover { background: #0e45d6; }
+
+#deploy-log         { margin-top: 18px; background: #1e1e2e; color: #e2e8f0; border-radius: 6px; padding: 14px; font-family: monospace; font-size: 12px; min-height: 60px; white-space: pre-wrap; display: none; }
+#deploy-log.success { border: 1px solid #28a745; }
+#deploy-log.error   { border: 1px solid #dc3545; }
+
+.no-routers   { grid-column: 1/-1; text-align: center; padding: 30px; color: #888; font-style: italic; }
+.no-templates { padding: 16px; background: #fff8e1; border: 1px solid #ffe082; border-radius: 6px; font-size: 13px; color: #795548; }

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <title>Network Automation Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    {% block styles %}{% endblock %}
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+    <nav>
+        {% if session.get('user_id') %}
+        <a href="/reports/dashboard">📊 Dashboard</a>
+        <a href="/devices/">🖥 Uređaji</a>
+        <a href="/configs/templates">📄 Predlošci</a>
+        <a href="/deploy/gns3">🚀 GNS3 Deploy</a>
+        <a href="/reports/topology">🗺 Topologija</a>
+        {% if session.get('user_role') == 'admin' %}
+        <a href="/reports/logs">📋 Logovi routera</a>
+        {% endif %}
+        {% endif %}
+        <div class="spacer"></div>
+        {% if session.get('user_email') %}
+        <span class="user-info">{{ session.user_email }}
+          {% if session.get('user_role') == 'admin' %}
+            <span style="background:#1a5cff;color:#fff;padding:1px 6px;border-radius:8px;font-size:10px;margin-left:4px">ADMIN</span>
+          {% endif %}
+        </span>
+        <button class="logout-btn" onclick="logoutUser()">Odjava</button>
+        {% endif %}
+    </nav>
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

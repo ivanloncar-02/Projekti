@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/logs.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="page">
+  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:12px">
+    <h2 style="margin:0">Logovi routera{% if filter_router %} — {{ filter_router }}{% endif %}</h2>
+  </div>
+
+  <div class="filter-bar">
+    <label style="font-weight:600; font-size:13px">Router:</label>
+    <select onchange="if(this.value) window.location='/reports/logs/router/'+encodeURIComponent(this.value); else window.location='/reports/logs'">
+      <option value="">— svi —</option>
+      {% for name in router_names %}
+      <option value="{{ name }}" {% if name == filter_router %}selected{% endif %}>{{ name }}</option>
+      {% endfor %}
+    </select>
+    {% if filter_router %}
+    <a href="/reports/logs">Prikaži sve</a>
+    {% endif %}
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Vrijeme</th>
+        <th>Router</th>
+        <th>Korisnik</th>
+        <th>Predložak</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for log in logs %}
+      <tr>
+        <td style="white-space:nowrap; color:#777">{{ log.timestamp_str }}</td>
+        <td><strong>{{ log.router_name or '—' }}</strong></td>
+        <td>{{ log.user_email or '—' }}</td>
+        <td><code style="font-size:11px">{{ log.template_name or '—' }}</code></td>
+        <td>
+          {% if log.status == 'uspjeh' %}
+            <span class="badge badge-ok">✓ uspjeh</span>
+          {% elif log.status == 'greska' %}
+            <span class="badge badge-err">✗ greška</span>
+          {% else %}
+            <span class="badge badge-info">{{ log.status }}</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" style="text-align:center;padding:20px;color:#888">Nema deployment aktivnosti.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
