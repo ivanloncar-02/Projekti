@@ -1,0 +1,121 @@
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  padding: 32px;
+}
+
+.error-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--app-gap);
+  padding: 12px 16px;
+  border-radius: var(--app-radius);
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+
+  p {
+    margin: 0;
+  }
+}
+
+.user-picker {
+  margin-block-end: var(--app-gap);
+  min-width: 220px;
+}
+
+.section-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mat-sys-on-surface-variant);
+  margin-block-end: 4px;
+}
+
+.header-section {
+  margin-block-end: calc(var(--app-gap) * 1.5);
+
+  h1 {
+    margin: 0 0 8px;
+  }
+}
+
+.header-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  color: var(--mat-sys-on-surface-variant);
+
+  strong {
+    color: var(--mat-sys-on-surface);
+    font-size: 1.1rem;
+  }
+}
+
+.kpi-section {
+  margin-block-end: calc(var(--app-gap) * 1.5);
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--app-gap);
+}
+
+.chart-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--app-gap);
+  margin-block-end: calc(var(--app-gap) * 1.5);
+}
+
+.heatmap-section {
+  margin-block-end: calc(var(--app-gap) * 1.5);
+}
+
+.history-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--app-gap);
+  margin-block-end: 8px;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.history-table {
+  width: 100%;
+}
+
+.no-data-row td {
+  text-align: center;
+  padding: 24px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.history-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.history-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border-radius: var(--app-radius);
+  background: var(--mat-sys-surface-container-low);
+}
+
+.history-card-top,
+.history-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

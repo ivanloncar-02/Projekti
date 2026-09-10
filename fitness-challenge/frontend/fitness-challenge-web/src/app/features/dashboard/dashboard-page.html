@@ -1,0 +1,150 @@
+@if (!users.hasValue() && !usersErrorTitle()) {
+  <div class="spinner-container">
+    <mat-progress-spinner mode="indeterminate" diameter="32" />
+  </div>
+} @else if (usersErrorTitle(); as message) {
+  <div class="error-banner" role="alert">
+    <p>{{ message }}</p>
+    <button mat-button (click)="retryUsers()">Retry</button>
+  </div>
+} @else {
+  <mat-form-field subscriptSizing="dynamic" class="user-picker">
+    <mat-label>User</mat-label>
+    <mat-select [value]="userId()" (selectionChange)="onUserChange($event)">
+      @for (user of users.value(); track user.id) {
+        <mat-option [value]="user.id">{{ user.firstName }} {{ user.lastName }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+}
+
+@if (!dashboard.hasValue() && !dashboardErrorTitle()) {
+  <div class="spinner-container">
+    <mat-progress-spinner mode="indeterminate" diameter="48" />
+  </div>
+} @else if (dashboardErrorTitle(); as message) {
+  <div class="error-banner" role="alert">
+    <p>{{ message }}</p>
+    <button mat-button (click)="retryDashboard()">Retry</button>
+  </div>
+} @else if (dashboard.value(); as data) {
+  <section class="header-section">
+    <span class="section-label">All-time</span>
+    <h1>{{ data.name }}</h1>
+    <div class="header-stats">
+      <span
+        ><strong>#{{ data.rank }}</strong> rank</span
+      >
+      <span
+        ><strong>{{ data.totalPoints }}</strong> total points</span
+      >
+      <span
+        ><strong>{{ data.streak.current }}</strong
+        >-day streak (best {{ data.streak.longest }})</span
+      >
+    </div>
+  </section>
+
+  <section class="kpi-section">
+    <span class="section-label">Showing: {{ rangeLabel() }}</span>
+    <div class="kpi-grid">
+      <app-kpi-card [value]="windowPoints().toString()" label="Points in this period" />
+      <app-kpi-card [value]="data.totals.distanceKm.toFixed(2) + ' km'" label="Distance" />
+      <app-kpi-card [value]="data.totals.minutes.toString()" label="Active minutes" />
+      <app-kpi-card [value]="data.totals.steps.toString()" label="Steps" />
+      <app-kpi-card [value]="data.totals.activities.toString()" label="Activities logged" />
+    </div>
+  </section>
+
+  <section class="chart-section">
+    <app-activity-volume-chart
+      [daily]="data.daily"
+      [rangeWindowDays]="rangeWindowDays()"
+      (rangeWindowDaysChange)="onRangeWindowChange($event)"
+    />
+    <app-sport-breakdown-chart [breakdown]="data.sportBreakdown" />
+  </section>
+
+  <section class="heatmap-section">
+    <app-activity-heatmap [userId]="userId()" />
+  </section>
+}
+
+<section class="history-section">
+  <div class="history-header">
+    <h2>Activity history</h2>
+    <mat-form-field subscriptSizing="dynamic">
+      <mat-label>Sport</mat-label>
+      <mat-select [value]="sportFilter()" (selectionChange)="onSportFilterChange($event.value)">
+        <mat-option value="all">All sports</mat-option>
+        @for (sport of sportFilterOptions(); track sport) {
+          <mat-option [value]="sport">
+            {{ sport === 'steps' ? 'Daily Steps' : (sport | titlecase) }}
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  @if (!activities.hasValue() && !activitiesErrorTitle()) {
+    <div class="spinner-container">
+      <mat-progress-spinner mode="indeterminate" diameter="32" />
+    </div>
+  } @else if (activitiesErrorTitle(); as message) {
+    <div class="error-banner" role="alert">
+      <p>{{ message }}</p>
+      <button mat-button (click)="retryActivities()">Retry</button>
+    </div>
+  } @else if (dataSource.data.length === 0) {
+    <app-empty-state icon="history" message="No activities logged yet." />
+  } @else {
+    @if (!isMobile().matches) {
+      <table mat-table matSort [dataSource]="dataSource" class="history-table">
+        <ng-container matColumnDef="datetime">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+          <td mat-cell *matCellDef="let row">{{ row.datetime | date: 'mediumDate' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="sport">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Sport</th>
+          <td mat-cell *matCellDef="let row">
+            <app-sport-chip [sport]="activitySportKey(row)" />
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="metric">
+          <th mat-header-cell *matHeaderCellDef>Metric</th>
+          <td mat-cell *matCellDef="let row">{{ metricFor(row) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="points">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Points</th>
+          <td mat-cell *matCellDef="let row">{{ row.points }}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        <tr *matNoDataRow class="no-data-row">
+          <td [attr.colspan]="displayedColumns.length">No activities match this filter.</td>
+        </tr>
+      </table>
+    } @else {
+      <div class="history-cards">
+        @for (row of visibleRows(); track row.id) {
+          <div class="history-card">
+            <div class="history-card-top">
+              <span>{{ row.datetime | date: 'mediumDate' }}</span>
+              <app-sport-chip [sport]="activitySportKey(row)" />
+            </div>
+            <div class="history-card-bottom">
+              <span>{{ metricFor(row) }}</span>
+              <strong>{{ row.points }} pts</strong>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <mat-paginator [pageSizeOptions]="[10, 25, 50]" [pageSize]="10" showFirstLastButtons />
+  }
+</section>

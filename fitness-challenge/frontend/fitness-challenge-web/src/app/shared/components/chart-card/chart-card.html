@@ -1,0 +1,16 @@
+<div class="chart-card">
+  <div class="chart-card-header">
+    <h3>{{ title() }}</h3>
+    <div class="chart-card-controls">
+      <ng-content select="[chartControls]" />
+    </div>
+  </div>
+
+  <div class="chart-card-canvas">
+    <ng-content />
+  </div>
+
+  <p class="visually-hidden">
+    <ng-content select="[chartSummary]" />
+  </p>
+</div>

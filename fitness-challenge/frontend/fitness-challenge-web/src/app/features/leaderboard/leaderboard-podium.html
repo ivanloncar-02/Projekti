@@ -1,0 +1,16 @@
+<div class="podium">
+  @for (entry of entries(); track entry.userId) {
+    <button
+      type="button"
+      class="podium-card"
+      [class]="'podium-card--rank-' + entry.rank"
+      (click)="pick.emit(entry.userId)"
+    >
+      <span class="avatar" aria-hidden="true">{{ initials(entry.name) }}</span>
+      <span class="rank-number" aria-hidden="true">#{{ entry.rank }}</span>
+      <span class="name">{{ entry.name }}</span>
+      <span class="points">{{ entry.totalPoints | number }} pts</span>
+      <app-rank-trend-badge [rankChange]="entry.rankChange" [isNew]="entry.isNew" />
+    </button>
+  }
+</div>

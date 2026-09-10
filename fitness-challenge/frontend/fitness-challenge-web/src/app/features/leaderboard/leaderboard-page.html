@@ -1,0 +1,54 @@
+<h1>Leaderboard</h1>
+
+<div class="controls">
+  <mat-button-toggle-group
+    [value]="trendWindow()"
+    (change)="onTrendWindowChange($event)"
+    aria-label="Trend window"
+  >
+    <mat-button-toggle [value]="7">7 days</mat-button-toggle>
+    <mat-button-toggle [value]="30">30 days</mat-button-toggle>
+  </mat-button-toggle-group>
+
+  <mat-form-field subscriptSizing="dynamic">
+    <mat-label>Filter by name</mat-label>
+    <input
+      matInput
+      [ngModel]="nameFilter()"
+      (ngModelChange)="nameFilter.set($event)"
+      autocomplete="off"
+    />
+    <mat-icon matSuffix aria-hidden="true">search</mat-icon>
+  </mat-form-field>
+</div>
+
+@if (!leaderboard.hasValue() && !errorTitle()) {
+  <div class="spinner-container">
+    <mat-progress-spinner mode="indeterminate" diameter="48" />
+  </div>
+} @else if (errorTitle(); as message) {
+  <div class="error-banner" role="alert">
+    <p>{{ message }}</p>
+    <button mat-button (click)="retry()">Retry</button>
+  </div>
+} @else if (totalCount() === 0) {
+  <app-empty-state icon="emoji_events" message="No users on the leaderboard yet.">
+    <a mat-flat-button routerLink="/users/new">Register a user</a>
+  </app-empty-state>
+} @else {
+  <div class="podium-wrapper" [class.podium-wrapper--collapsed]="podiumEntries().length === 0">
+    <div class="podium-wrapper-inner">
+      <app-leaderboard-podium [entries]="podiumEntries()" (pick)="onSelect($event)" />
+    </div>
+  </div>
+
+  @if (listEntries().length > 0) {
+    <div class="ranking-list">
+      @for (entry of listEntries(); track entry.userId) {
+        <app-leaderboard-row [entry]="entry" (pick)="onSelect($event)" />
+      }
+    </div>
+  } @else if (podiumEntries().length === 0) {
+    <app-empty-state icon="search_off" [message]="'No results for \'' + nameFilter() + '\'.'" />
+  }
+}

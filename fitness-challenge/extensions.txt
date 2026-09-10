@@ -1,0 +1,9 @@
+code --install-extension ms-dotnettools.csdevkit
+code --install-extension Angular.ng-template
+code --install-extension dbaeumer.vscode-eslint
+code --install-extension esbenp.prettier-vscode
+code --install-extension EditorConfig.EditorConfig
+code --install-extension usernamehw.errorlens
+code --install-extension eamodio.gitlens
+code --install-extension humao.rest-client
+code --install-extension qwtel.sqlite-viewer

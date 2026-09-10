@@ -1,0 +1,40 @@
+@if (!dashboard.hasValue() && !errorTitle()) {
+  <app-chart-card title="Activity heatmap (last 12 weeks)">
+    <div class="heatmap-loading">Loading…</div>
+    <span chartSummary>Loading the activity heatmap.</span>
+  </app-chart-card>
+} @else if (errorTitle(); as message) {
+  <app-chart-card title="Activity heatmap (last 12 weeks)">
+    <div class="error-banner" role="alert">
+      <p>{{ message }}</p>
+      <button mat-button (click)="retry()">Retry</button>
+    </div>
+    <span chartSummary>{{ message }}</span>
+  </app-chart-card>
+} @else {
+  <app-chart-card title="Activity heatmap (last 12 weeks)">
+    <div class="heatmap-scroll">
+      <div class="heatmap-grid">
+        @for (week of weeks(); track $index) {
+          <div class="heatmap-week">
+            @for (cell of week; track $index) {
+              @if (cell.kind === 'day') {
+                <button
+                  type="button"
+                  class="heatmap-cell"
+                  [style.background]="cell.background"
+                  [matTooltip]="cellTooltip(cell)"
+                  [attr.aria-label]="cellTooltip(cell)"
+                ></button>
+              } @else {
+                <span class="heatmap-cell heatmap-cell--placeholder" aria-hidden="true"></span>
+              }
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <span chartSummary>{{ summary() }}</span>
+  </app-chart-card>
+}

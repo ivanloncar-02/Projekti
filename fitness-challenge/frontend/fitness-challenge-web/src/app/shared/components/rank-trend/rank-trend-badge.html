@@ -1,0 +1,20 @@
+@let t = trend();
+
+<span class="rank-trend" [class]="'rank-trend--' + t.kind" role="img" [attr.aria-label]="label()">
+  @switch (t.kind) {
+    @case ('up') {
+      <mat-icon aria-hidden="true">arrow_upward</mat-icon>
+      <span aria-hidden="true">+{{ t.places }}</span>
+    }
+    @case ('down') {
+      <mat-icon aria-hidden="true">arrow_downward</mat-icon>
+      <span aria-hidden="true">-{{ t.places }}</span>
+    }
+    @case ('unchanged') {
+      <span aria-hidden="true">–</span>
+    }
+    @case ('new') {
+      <span class="new-chip" aria-hidden="true">NEW</span>
+    }
+  }
+</span>

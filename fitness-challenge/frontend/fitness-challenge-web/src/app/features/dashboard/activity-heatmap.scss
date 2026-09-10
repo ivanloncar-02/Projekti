@@ -1,0 +1,61 @@
+.heatmap-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.error-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--app-gap);
+  padding: 12px 16px;
+  border-radius: var(--app-radius);
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+
+  p {
+    margin: 0;
+  }
+}
+
+// Rule 10 (docs): wide content scrolls inside its own container rather than
+// the page body - at 12 columns this grid is wider than a 360px viewport.
+.heatmap-scroll {
+  overflow-x: auto;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.heatmap-grid {
+  display: flex;
+  gap: 3px;
+}
+
+.heatmap-week {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.heatmap-cell {
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: 1px;
+  }
+}
+
+.heatmap-cell--placeholder {
+  cursor: default;
+  visibility: hidden;
+}

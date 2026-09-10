@@ -1,0 +1,41 @@
+:host {
+  display: inline-flex;
+}
+
+.rank-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-weight: 600;
+  font-size: 0.875rem;
+
+  mat-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+  }
+}
+
+.rank-trend--up {
+  // A green that holds up against --mat-sys-error's red for colour-blind
+  // users too - relies on the arrow direction/shape as the primary signal,
+  // this is just reinforcement.
+  color: #2f9e44;
+}
+
+.rank-trend--down {
+  color: var(--mat-sys-error);
+}
+
+.rank-trend--unchanged {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.new-chip {
+  background: var(--mat-sys-tertiary-container);
+  color: var(--mat-sys-on-tertiary-container);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+}

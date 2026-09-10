@@ -1,0 +1,5 @@
+<app-chart-card title="Sport breakdown">
+  <canvas baseChart type="doughnut" [data]="chartData()" [options]="chartOptions()"></canvas>
+
+  <span chartSummary>{{ summary() }}</span>
+</app-chart-card>

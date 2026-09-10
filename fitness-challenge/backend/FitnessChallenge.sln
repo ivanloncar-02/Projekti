@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FitnessChallenge.Api", "FitnessChallenge.Api\FitnessChallenge.Api.csproj", "{BCBFBD95-A105-4643-82CB-7EE9C7A2854B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FitnessChallenge.Tests", "FitnessChallenge.Tests\FitnessChallenge.Tests.csproj", "{B376D07A-5D7A-48B6-95A8-4476D16209E8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BCBFBD95-A105-4643-82CB-7EE9C7A2854B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCBFBD95-A105-4643-82CB-7EE9C7A2854B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCBFBD95-A105-4643-82CB-7EE9C7A2854B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCBFBD95-A105-4643-82CB-7EE9C7A2854B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B376D07A-5D7A-48B6-95A8-4476D16209E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B376D07A-5D7A-48B6-95A8-4476D16209E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B376D07A-5D7A-48B6-95A8-4476D16209E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B376D07A-5D7A-48B6-95A8-4476D16209E8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

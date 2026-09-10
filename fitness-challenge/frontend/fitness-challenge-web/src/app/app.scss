@@ -1,0 +1,24 @@
+.app-name {
+  font: var(--mat-sys-title-large);
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.active-link {
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}
+
+main {
+  max-width: var(--app-max-width);
+  margin-inline: auto;
+  padding: var(--app-gap);
+}

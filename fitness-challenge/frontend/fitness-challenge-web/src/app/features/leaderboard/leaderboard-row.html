@@ -1,0 +1,16 @@
+@let e = entry();
+
+<button type="button" class="row" [attr.aria-label]="e.name + ', rank ' + e.rank" (click)="pick.emit(e.userId)">
+  <span class="cell cell--rank" aria-hidden="true">{{ e.rank }}</span>
+  <span class="cell cell--avatar" aria-hidden="true">{{ initials(e.name) }}</span>
+  <span class="cell cell--name">{{ e.name }}</span>
+  <span class="cell cell--points">
+    <span class="cell-label">Points</span>{{ e.totalPoints | number }}
+  </span>
+  <span class="cell cell--trend">
+    <app-rank-trend-badge [rankChange]="e.rankChange" [isNew]="e.isNew" />
+  </span>
+  <span class="cell cell--window">
+    <span class="cell-label">This window</span>{{ e.pointsInWindow | number }}
+  </span>
+</button>

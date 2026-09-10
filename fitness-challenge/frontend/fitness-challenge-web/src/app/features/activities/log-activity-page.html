@@ -1,0 +1,127 @@
+<div class="page">
+  <h1>Log activity</h1>
+
+  @if (!users.hasValue() && !usersError()) {
+    <div class="spinner-container">
+      <mat-progress-spinner mode="indeterminate" diameter="32" />
+    </div>
+  } @else if (usersError(); as message) {
+    <div class="error-banner" role="alert">
+      <p>{{ message }}</p>
+      <button mat-button type="button" (click)="retryUsers()">Retry</button>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <mat-form-field>
+        <mat-label>User</mat-label>
+        <mat-select formControlName="userId">
+          @for (user of users.value(); track user.id) {
+            <mat-option [value]="user.id">{{ user.firstName }} {{ user.lastName }}</mat-option>
+          }
+        </mat-select>
+        @if (form.controls.userId.errors?.['required']) {
+          <mat-error>User is required.</mat-error>
+        } @else if (form.controls.userId.errors?.['server']; as message) {
+          <mat-error>{{ message }}</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="date-time-row">
+        <mat-form-field>
+          <mat-label>Date</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="date" />
+          <mat-datepicker-toggle matSuffix [for]="picker" />
+          <mat-datepicker #picker />
+          @if (form.controls.date.errors?.['required']) {
+            <mat-error>Date is required.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Time</mat-label>
+          <input matInput type="time" formControlName="time" />
+          @if (form.controls.time.errors?.['required']) {
+            <mat-error>Time is required.</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      @if (form.errors?.['futureWindow']) {
+        <p class="form-error" role="alert">
+          Date and time must not be more than 24 hours in the future.
+        </p>
+      }
+
+      <mat-form-field>
+        <mat-label>Sport</mat-label>
+        <mat-select formControlName="sport">
+          @for (option of sportOptions; track option.value) {
+            <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          }
+          <mat-option value="steps">Daily steps</mat-option>
+        </mat-select>
+        @if (form.controls.sport.errors?.['required']) {
+          <mat-error>Sport is required.</mat-error>
+        } @else if (form.controls.sport.errors?.['server']; as message) {
+          <mat-error>{{ message }}</mat-error>
+        }
+      </mat-form-field>
+
+      <!--
+      The metric field SWAPS: only one of these three ever appears, driven by
+      metricKind() (set from the sport control's own value) - not three fields
+      shown/hidden by CSS, an actual @switch so the DOM itself changes shape.
+    -->
+      @switch (metricKind()) {
+        @case ('distance') {
+          <mat-form-field>
+            <mat-label>Distance (km)</mat-label>
+            <input matInput type="number" step="0.01" min="0" formControlName="distance" />
+            @if (form.controls.distance.errors?.['required']) {
+              <mat-error>Distance is required.</mat-error>
+            } @else if (form.controls.distance.errors?.['positive']) {
+              <mat-error>Distance must be greater than zero.</mat-error>
+            } @else if (form.controls.distance.errors?.['server']; as message) {
+              <mat-error>{{ message }}</mat-error>
+            }
+          </mat-form-field>
+        }
+        @case ('duration') {
+          <mat-form-field>
+            <mat-label>Duration (mm:ss)</mat-label>
+            <input matInput placeholder="45:30" formControlName="duration" />
+            @if (form.controls.duration.errors?.['required']) {
+              <mat-error>Duration is required.</mat-error>
+            } @else if (form.controls.duration.errors?.['pattern']) {
+              <mat-error>Duration must match mm:ss (e.g. 45:30), with seconds 00-59.</mat-error>
+            } @else if (form.controls.duration.errors?.['server']; as message) {
+              <mat-error>{{ message }}</mat-error>
+            }
+          </mat-form-field>
+        }
+        @case ('steps') {
+          <mat-form-field>
+            <mat-label>Steps</mat-label>
+            <input matInput type="number" step="1" min="1" formControlName="steps" />
+            @if (form.controls.steps.errors?.['required']) {
+              <mat-error>Steps is required.</mat-error>
+            } @else if (form.controls.steps.errors?.['positiveInteger']) {
+              <mat-error>Steps must be a whole number greater than zero.</mat-error>
+            } @else if (form.controls.steps.errors?.['server']; as message) {
+              <mat-error>{{ message }}</mat-error>
+            }
+          </mat-form-field>
+        }
+        @default {
+          <p class="metric-hint">Choose a sport to log its metric.</p>
+        }
+      }
+
+      @if (formError(); as message) {
+        <p class="form-error" role="alert">{{ message }}</p>
+      }
+
+      <button mat-flat-button type="submit" [disabled]="submitting()">Log activity</button>
+    </form>
+  }
+</div>

@@ -1,0 +1,20 @@
+.kpi-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  border-radius: var(--app-radius);
+  background: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface);
+}
+
+.kpi-value {
+  font-size: 1.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.kpi-label {
+  font-size: 0.8rem;
+  color: var(--mat-sys-on-surface-variant);
+}

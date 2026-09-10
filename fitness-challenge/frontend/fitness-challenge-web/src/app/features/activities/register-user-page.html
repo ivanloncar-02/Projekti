@@ -1,0 +1,33 @@
+<div class="page">
+  <h1>Register user</h1>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <mat-form-field>
+      <mat-label>First name</mat-label>
+      <input matInput formControlName="firstName" maxlength="100" />
+      @if (form.controls.firstName.errors?.['required']) {
+        <mat-error>First name is required.</mat-error>
+      } @else if (form.controls.firstName.errors?.['maxlength']) {
+        <mat-error>First name must not exceed 100 characters.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Last name</mat-label>
+      <input matInput formControlName="lastName" maxlength="100" />
+      @if (form.controls.lastName.errors?.['required']) {
+        <mat-error>Last name is required.</mat-error>
+      } @else if (form.controls.lastName.errors?.['maxlength']) {
+        <mat-error>Last name must not exceed 100 characters.</mat-error>
+      } @else if (form.controls.lastName.errors?.['server']; as message) {
+        <mat-error>{{ message }}</mat-error>
+      }
+    </mat-form-field>
+
+    @if (formError(); as message) {
+      <p class="form-error" role="alert">{{ message }}</p>
+    }
+
+    <button mat-flat-button type="submit" [disabled]="submitting()">Register</button>
+  </form>
+</div>

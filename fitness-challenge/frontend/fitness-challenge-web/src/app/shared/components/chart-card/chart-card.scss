@@ -1,0 +1,53 @@
+.chart-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: var(--app-radius);
+  background: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface);
+}
+
+.chart-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+  }
+}
+
+.chart-card-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  // Empty when a card has no projected controls (sport-breakdown chart) -
+  // collapse instead of leaving a hollow gap next to the title.
+  &:empty {
+    display: none;
+  }
+}
+
+.chart-card-canvas {
+  position: relative;
+  height: 260px;
+}
+
+// Standard clip-without-hiding pattern: still in the accessibility tree and
+// readable by screen readers, invisible and untouchable on screen.
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

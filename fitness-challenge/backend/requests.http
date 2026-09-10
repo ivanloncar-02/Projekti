@@ -1,0 +1,476 @@
+### Fitness Challenge — API smoke tests (REST Client extension format)
+### Run top to bottom. Variables capture ids from earlier responses, so no GUID needs
+### hand-editing. Assumes the API is running with a freshly-seeded database (A9) — the
+### seeder creates 6 demo users including "Ivan Horvat", which the duplicate-user test
+### below deliberately targets.
+
+@baseUrl = http://localhost:5080
+
+###############################################################################
+# 1. Users
+###############################################################################
+
+### Register a new user
+### Expected: 201 Created — { id }
+### "Petar Novosel" is not one of the 6 seeded names (Ana Novak, Marko Kovačević,
+### Petra Babić, Ivan Horvat, Marija Jurić, Luka Perić), so this can't collide.
+# @name registerUser
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+{
+  "firstName": "Petar",
+  "lastName": "Novosel"
+}
+
+###
+
+@newUserId = {{registerUser.response.body.$.id}}
+
+### Duplicate user — deliberately targets the seeded "Ivan Horvat"
+### Expected: 409 Conflict
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+{
+  "firstName": "Ivan",
+  "lastName": "Horvat"
+}
+
+### Invalid user — blank firstName
+### Expected: 400 Bad Request — errors.firstName
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+{
+  "firstName": "",
+  "lastName": "Novosel"
+}
+
+### Empty body
+### Expected: 400 Bad Request — errors.body (not "request", not "")
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+### Get all users (the first call the frontend makes — user picker)
+### Expected: 200 OK — array with totalPoints per user
+GET {{baseUrl}}/api/users
+
+###############################################################################
+# 2. Activities — one valid request per sport, plus Daily Steps
+###############################################################################
+# All on the freshly registered user, so the dashboard section below has a
+# small, fully predictable set of activities to reflect back.
+
+### Running — 100 pts/km
+### Expected: 201 Created — { id, points: 500 }
+# @name createRunning
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "{{newUserId}}",
+  "datetime": "2026-09-08T09:00:00Z",
+  "sport": "running",
+  "distance": 5.0
+}
+
+###
+
+@runningActivityId = {{createRunning.response.body.$.id}}
+
+### Walking — 50 pts/km
+### Expected: 201 Created — { id, points: 150 }
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "{{newUserId}}",
+  "datetime": "2026-09-08T10:00:00Z",
+  "sport": "walking",
+  "distance": 3.0
+}
+
+### Cycling — 25 pts/km
+### Expected: 201 Created — { id, points: 375 }
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "{{newUserId}}",
+  "datetime": "2026-09-08T11:00:00Z",
+  "sport": "cycling",
+  "distance": 15.0
+}
+
+### Gym — 5 pts/min
+### Expected: 201 Created — { id, points: 225 }
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "{{newUserId}}",
+  "datetime": "2026-09-08T12:00:00Z",
+  "sport": "gym",
+  "duration": "45:00"
+}
+
+### Swimming — 15 pts/min
+### Expected: 201 Created — { id, points: 450 }
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "{{newUserId}}",
+  "datetime": "2026-09-08T13:00:00Z",
+  "sport": "swimming",
+  "duration": "30:00"
+}
+
+### Daily Steps — 1 pt/100 steps — sport omitted, not "dailysteps"
+### Expected: 201 Created — { id, points: 80 }
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "{{newUserId}}",
+  "datetime": "2026-09-08T20:00:00Z",
+  "steps": 8000
+}
+
+### The assignment's own "Valid" example, pasted verbatim — trailing comma and all.
+### AllowTrailingCommas is on, so this is accepted (walking 6 km -> 600 pts).
+### Expected: 201 Created — { id, points: 600 }
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "{{newUserId}}",
+  "datetime": "2026-09-08T06:00:00Z",
+  "sport": "walking",
+  "distance": 6.0,
+}
+
+###############################################################################
+# 3. Duplicate Daily Steps on the same UTC day (one-per-day, our design decision)
+###############################################################################
+
+### Same user, same UTC calendar day (2026-09-08) as the Daily Steps request above
+### Expected: 400 Bad Request — errors.steps
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "{{newUserId}}",
+  "datetime": "2026-09-08T21:30:00Z",
+  "steps": 6000
+}
+
+###############################################################################
+# 4. Invalid activities — FluentValidation rules
+###############################################################################
+# Everything below has valid, parseable JSON (right types for datetime/distance/
+# steps) but fails a business rule — FluentValidation runs and reports a
+# field-keyed ValidationProblemDetails. Contrast with section 5.
+
+### userId missing
+### Expected: 400 Bad Request — errors.userId
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "datetime": "2026-09-08T09:00:00Z",
+  "sport": "running",
+  "distance": 5.0
+}
+
+### userId blank
+### Expected: 400 Bad Request — errors.userId
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "",
+  "datetime": "2026-09-08T09:00:00Z",
+  "sport": "running",
+  "distance": 5.0
+}
+
+### userId not a GUID
+### Expected: 400 Bad Request — errors.userId
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "not-a-guid",
+  "datetime": "2026-09-08T09:00:00Z",
+  "sport": "running",
+  "distance": 5.0
+}
+
+### userId well-formed but does not exist
+### Expected: 400 Bad Request — errors.userId
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "00000000-0000-0000-0000-000000000000",
+  "datetime": "2026-09-08T09:00:00Z",
+  "sport": "running",
+  "distance": 5.0
+}
+
+### datetime missing
+### Expected: 400 Bad Request — errors.datetime
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "{{newUserId}}",
+  "sport": "running",
+  "distance": 5.0
+}
+
+### datetime more than 24h in the future
+### Expected: 400 Bad Request — errors.datetime
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "{{newUserId}}",
+  "datetime": "2026-09-15T09:00:00Z",
+  "sport": "running",
+  "distance": 5.0
+}
+
+### Unknown sport spelling — closest thing to a real client typo ("jogging" is not
+### "running"). Proves the resolver rejects unrecognized values rather than
+### guessing/falling back to something plausible.
+### Expected: 400 Bad Request — errors.sport
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "{{newUserId}}",
+  "datetime": "2026-09-08T09:00:00Z",
+  "sport": "jogging",
+  "distance": 5.0
+}
+
+### sport and steps both omitted — nothing to record
+### Expected: 400 Bad Request — errors.sport
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "{{newUserId}}",
+  "datetime": "2026-09-08T09:00:00Z"
+}
+
+### The assignment's own example: swimming with distance instead of duration
+### Expected: 400 Bad Request — errors.distance
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "{{newUserId}}",
+  "datetime": "2026-09-08T09:00:00Z",
+  "sport": "swimming",
+  "distance": 1.5
+}
+
+### Extra metric alongside the correct one
+### Expected: 400 Bad Request — errors.steps
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "{{newUserId}}",
+  "datetime": "2026-09-08T09:00:00Z",
+  "sport": "running",
+  "distance": 5.0,
+  "steps": 1000
+}
+
+### distance = 0 — accepted, scores 0 points (matches duration "0:00" / steps 0)
+### Expected: 201 Created — { id, points: 0 }
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "{{newUserId}}",
+  "datetime": "2026-09-08T07:30:00Z",
+  "sport": "running",
+  "distance": 0
+}
+
+### distance negative
+### Expected: 400 Bad Request — errors.distance
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "{{newUserId}}",
+  "datetime": "2026-09-08T09:00:00Z",
+  "sport": "running",
+  "distance": -1
+}
+
+### duration not matching ^\d{1,4}:[0-5]\d$ (invalid seconds component)
+### Expected: 400 Bad Request — errors.duration
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "{{newUserId}}",
+  "datetime": "2026-09-08T09:00:00Z",
+  "sport": "gym",
+  "duration": "10:75"
+}
+
+### duration present with a sport that expects distance
+### Expected: 400 Bad Request — errors.duration
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "{{newUserId}}",
+  "datetime": "2026-09-08T09:00:00Z",
+  "sport": "running",
+  "duration": "30:00"
+}
+
+### steps < 0
+### Expected: 400 Bad Request — errors.steps
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "{{newUserId}}",
+  "datetime": "2026-09-08T09:00:00Z",
+  "steps": -1
+}
+
+### steps = 0 — accepted, scores 0 points (matches duration "0:00"; the scoring
+### layer floors sub-100 counts to 0). Uses 2026-09-09 so it doesn't trip the
+### one-per-day Daily Steps rule against the 8000-step entry (2026-09-08) in section 2.
+### Expected: 201 Created — { id, points: 0 }
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "{{newUserId}}",
+  "datetime": "2026-09-09T09:00:00Z",
+  "steps": 0
+}
+
+###############################################################################
+# 5. Invalid activities — deserialization boundary
+###############################################################################
+# Everything below fails at the System.Text.Json boundary, BEFORE a
+# CreateActivityRequest object exists and BEFORE FluentValidation ever runs
+# (see A4/A6). ASP.NET Core's [ApiController] turns the parse failure into a
+# 400 automatically, but the error is framework-shaped (keyed by the raw JSON
+# path, not a clean field name) — a different mechanism from section 4, not
+# just a different rule.
+
+### datetime not parseable as ISO 8601 — Datetime is a strongly-typed
+### DateTimeOffset?, so this never reaches the validator
+### Expected: 400 Bad Request (framework-shaped, not ValidationProblemDetails)
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "{{newUserId}}",
+  "datetime": "not-a-date",
+  "sport": "running",
+  "distance": 5.0
+}
+
+### distance non-numeric — Distance is a strongly-typed decimal?
+### Expected: 400 Bad Request (framework-shaped)
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "{{newUserId}}",
+  "datetime": "2026-09-08T09:00:00Z",
+  "sport": "running",
+  "distance": "abc"
+}
+
+### steps non-integer — Steps is a strongly-typed int?
+### Expected: 400 Bad Request (framework-shaped)
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{
+  "userId": "{{newUserId}}",
+  "datetime": "2026-09-08T09:00:00Z",
+  "steps": 3.5
+}
+
+### Malformed JSON
+### Expected: 400 Bad Request (framework-shaped)
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+{ invalid
+
+### Empty body
+### Expected: 400 Bad Request — errors.body (not "request", not "")
+POST {{baseUrl}}/api/activities
+Content-Type: application/json
+
+###############################################################################
+# 6. Leaderboard
+###############################################################################
+
+### Expected: 200 OK — array with rank, previousRank, rankChange, pointsInWindow
+GET {{baseUrl}}/api/leaderboard?trendWindowDays=7
+
+###############################################################################
+# 7. Dashboard — with and without from/to
+###############################################################################
+# Both target the freshly registered user, so the numbers trace directly back
+# to the 6 activities created in section 2 (totalPoints/rank/streak are
+# all-time regardless of the range — see docs/01-spec-backend.md section 3.6).
+
+### Default range (last 30 days, no from/to)
+### Expected: 200 OK
+GET {{baseUrl}}/api/users/{{newUserId}}/dashboard
+
+### Explicit range covering the seeded activities
+### Expected: 200 OK — totals/daily/sportBreakdown scoped to this range
+GET {{baseUrl}}/api/users/{{newUserId}}/dashboard?from=2026-09-01&to=2026-09-09
+
+###############################################################################
+# 8. Activities — filters and paging
+###############################################################################
+
+### Expected: 200 OK — PagedResult, only this user's running activities
+GET {{baseUrl}}/api/activities?
+    userId={{newUserId}}
+    &sport=running
+    &page=1
+    &pageSize=10
+
+###############################################################################
+# 9. Get by id
+###############################################################################
+
+### User by id
+### Expected: 200 OK
+GET {{baseUrl}}/api/users/{{newUserId}}
+
+### User by id — unknown id
+### Expected: 404 Not Found
+GET {{baseUrl}}/api/users/00000000-0000-0000-0000-000000000000
+
+### Activity by id
+### Expected: 200 OK
+GET {{baseUrl}}/api/activities/{{runningActivityId}}
+
+### Activity by id — unknown id
+### Expected: 404 Not Found
+GET {{baseUrl}}/api/activities/00000000-0000-0000-0000-000000000000
